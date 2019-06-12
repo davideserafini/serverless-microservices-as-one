@@ -7,6 +7,7 @@ const yaml = require('yaml-boost');
 const {
   spawn
 } = require('child_process');
+const argv = require('minimist')(process.argv.slice(2));
 
 // Get lambdas from config file
 const getLambdas = (config) => {
@@ -43,7 +44,10 @@ const getEndpointsForService = (configFile) => {
 const runService = (path, args, port) => {
   const slsArgs = ['offline', 'start', '--port', port].concat(args);
   const child = spawn('sls', slsArgs, {
-    env: {...process.env, SLS_DEBUG: '*'},
+    env: {
+      ...process.env,
+      SLS_DEBUG: '*'
+    },
     cwd: path
   });
 
@@ -65,12 +69,16 @@ const runService = (path, args, port) => {
   return child;
 }
 
-
 // STARTUP
+if (!argv['servicesFolderPath']) {
+  console.log('servicesFolderPath argument is mandatory. Usage node index.js --servicesFolderPath path/to/services/directory');
+  process.exitCode = 1;
+  process.exit(); // TODO Remove this during code refactoring https://github.com/davideserafini/serverless-microservices-as-one/issues/4
+}
 
 // Parse config files
-// TODO: pass /functions as argument from command line
-const servicesRootDir = path.join(__dirname, '/../functions/')
+const serviceFolderPath = argv['servicesFolderPath'];
+const servicesRootDir = path.isAbsolute(serviceFolderPath) ? serviceFolderPath : path.join(__dirname, serviceFolderPath);
 const serviceDirectories = readdirSync(servicesRootDir).filter((element) => statSync(path.join(servicesRootDir, element)).isDirectory());
 
 const childProcesses = [];
@@ -90,7 +98,10 @@ serviceDirectories.forEach((serviceDir, index) => {
 
   // Get endpoints for service and add the info related to the matching serverless offline server
   let endpoints = getEndpointsForService(serverless);
-  endpoints = endpoints.map((element) => { element.host = `http://localhost:${processPort}`; return element; })
+  endpoints = endpoints.map((element) => {
+    element.host = `http://localhost:${processPort}`;
+    return element;
+  })
 
   // Update mappings
   mapping = mapping.concat(endpoints);
@@ -163,14 +174,14 @@ const server = app.listen(app.get('port'), () => {
 });
 
 // Ensure all child processes always exit
-process.on( 'SIGTERM', function () {
+process.on('SIGTERM', function () {
   childProcesses.forEach((child) => {
     child.kill();
   });
   server.close();
   process.exit(1);
 });
-process.on( 'SIGINT', function () {
+process.on('SIGINT', function () {
   childProcesses.forEach((child) => {
     child.kill();
   });

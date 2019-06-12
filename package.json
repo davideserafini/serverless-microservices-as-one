@@ -1,0 +1,16 @@
+{
+  "name": "serverless-microservices-as-one",
+  "version": "1.0.0",
+  "description": "A tool to expose multiple running instances of serverless-offline as a single backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Davide Serafini <davide@davideserafini.com>",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.17.1",
+    "got": "^9.6.0",
+    "yaml-boost": "^1.9.7"
+  }
+}

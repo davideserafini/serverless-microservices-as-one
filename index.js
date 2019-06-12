@@ -44,10 +44,6 @@ const getEndpointsForService = (configFile) => {
 const runService = (path, args, port) => {
   const slsArgs = ['offline', 'start', '--port', port].concat(args);
   const child = spawn('sls', slsArgs, {
-    env: {
-      ...process.env,
-      SLS_DEBUG: '*'
-    },
     cwd: path
   });
 
@@ -85,13 +81,20 @@ const childProcesses = [];
 const basePort = 3002; // 3001 must be kept free for the proxy
 let mapping = []; // Maps each endpoint to its serverless offline server
 
+// Get serverless offline args
+let slsOfflineArgs = [];
+const stage = argv['stage'] || null;
+if (stage) {
+  slsOfflineArgs = [...slsOfflineArgs, '--stage', stage];
+}
+
 // Loop on each service and start it. A reference will be added to childProcesses
 serviceDirectories.forEach((serviceDir, index) => {
   const serviceFullPath = path.join(servicesRootDir, '/', serviceDir);
   const processPort = basePort + index;
   // Run serverless offline. As this is running in its own process, it's execution become async once the process is spawn
   // TODO: pass stage argument from command line
-  childProcesses.push(runService(serviceFullPath, ['--stage', 'dev'], processPort));
+  childProcesses.push(runService(serviceFullPath, slsOfflineArgs, processPort));
 
   // Read serverless.yml config
   const serverless = yaml.load(path.join(serviceFullPath, '/serverless.yml'));

@@ -72,13 +72,17 @@ if (!argv['servicesFolderPath']) {
   process.exit(); // TODO Remove this during code refactoring https://github.com/davideserafini/serverless-microservices-as-one/issues/4
 }
 
+const appPort = argv['appPort'] || 3001;
+
+// Restrict sls starting port to a value greater than appPort, to avoid collision when incrementing the value
+const slsBasePort = argv['port'] && argv['port'] > appPort ? argv['port'] : appPort + 1;
+
 // Parse config files
 const serviceFolderPath = argv['servicesFolderPath'];
 const servicesRootDir = path.isAbsolute(serviceFolderPath) ? serviceFolderPath : path.join(__dirname, serviceFolderPath);
 const serviceDirectories = readdirSync(servicesRootDir).filter((element) => statSync(path.join(servicesRootDir, element)).isDirectory());
 
 const childProcesses = [];
-const basePort = 3002; // 3001 must be kept free for the proxy
 let mapping = []; // Maps each endpoint to its serverless offline server
 
 // Get serverless offline args
@@ -91,7 +95,7 @@ if (stage) {
 // Loop on each service and start it. A reference will be added to childProcesses
 serviceDirectories.forEach((serviceDir, index) => {
   const serviceFullPath = path.join(servicesRootDir, serviceDir);
-  const processPort = basePort + index;
+  const processPort = slsBasePort + index;
   // Run serverless offline. As this is running in its own process, it's execution become async once the process is spawn
   // TODO: pass stage argument from command line
   childProcesses.push(runService(serviceFullPath, slsOfflineArgs, processPort));
@@ -115,7 +119,6 @@ const got = require('got');
 const express = require('express');
 const app = express();
 app.use(express.json());
-const appPort = 3001;
 app.set('port', appPort);
 
 console.log(mapping);

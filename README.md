@@ -28,4 +28,6 @@ This is basically what it does:
 
 I'd like to make this more ready for a general use so in the next days I will add for sure support for passing arguments at startup and solve the TODOs left in the code.
 
+Check the issue tab to see what's planned in details
+
 Any comment, idea or test is appreciated :)

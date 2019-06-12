@@ -90,14 +90,14 @@ if (stage) {
 
 // Loop on each service and start it. A reference will be added to childProcesses
 serviceDirectories.forEach((serviceDir, index) => {
-  const serviceFullPath = path.join(servicesRootDir, '/', serviceDir);
+  const serviceFullPath = path.join(servicesRootDir, serviceDir);
   const processPort = basePort + index;
   // Run serverless offline. As this is running in its own process, it's execution become async once the process is spawn
   // TODO: pass stage argument from command line
   childProcesses.push(runService(serviceFullPath, slsOfflineArgs, processPort));
 
   // Read serverless.yml config
-  const serverless = yaml.load(path.join(serviceFullPath, '/serverless.yml'));
+  const serverless = yaml.load(path.join(serviceFullPath, 'serverless.yml'));
 
   // Get endpoints for service and add the info related to the matching serverless offline server
   let endpoints = getEndpointsForService(serverless);

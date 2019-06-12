@@ -14,16 +14,17 @@ This is basically what it does:
 * show all console output of every service in its console
 
 ## How to use
-* Create a directory for the proxy at the same level of your services container folder
-* Simply run node index.js to start
+* run `node index.js --servicesFolderPath path/to/services`
+### Command line options
+```
+--servicesFolderPath path to folder containing services
+--appPort            port to listen to, default 3001
+--port               port to start sls offline from
+--stage              stage for sls offline
+```
 
 ## Please note
 * I've created this in less than 3 hours, so it's not so well written (but at least it's commented!)
-* It's custom based for my current needs (e.g. hardcoded stages, arguments and paths), specifically:
-    * it needs to be placed in a directory at the same level of your services container folder
-    * that folder needs to be called functions
-    * it runs sls offline start with --stage dev
-    * SLS_DEBUG is set to *
 * It's my first project with node and express 😅
 
 I'd like to make this more ready for a general use so in the next days I will add for sure support for passing arguments at startup and solve the TODOs left in the code.

@@ -3,42 +3,11 @@ const {
   statSync
 } = require('fs')
 const path = require('path')
-const yaml = require('yaml-boost')
 const {
   spawn
 } = require('child_process')
 const argv = require('minimist')(process.argv.slice(2))
-
-// Get lambdas from config file
-const getLambdas = (config) => {
-  return config.functions
-}
-
-// Parse endpoints for each function
-const getEndpointsForService = (configFile) => {
-  const lambdas = getLambdas(configFile)
-  const events = Object.keys(lambdas)
-    .filter((element) => lambdas[element].events && lambdas[element].events[0].http)
-    .map((element) => {
-      const event = lambdas[element].events[0].http
-      const path = event.path
-        .split('/')
-        .map((element) => {
-          // Express uses :param for named parameters, serverless uses {param}
-          if (!element.startsWith('{')) {
-            return element
-          } else {
-            return element.replace('{', ':').replace('}', '')
-          }
-        })
-        .join('/')
-      return {
-        path: path,
-        method: event.method
-      }
-    })
-  return events
-}
+const serverlessConfig = require('./lib/serverless/configuration')
 
 // Run servless offline, bind its console output to the main console output and return the child process
 const runService = (path, args, port) => {
@@ -101,10 +70,10 @@ serviceDirectories.forEach((serviceDir, index) => {
   childProcesses.push(runService(serviceFullPath, slsOfflineArgs, processPort))
 
   // Read serverless.yml config
-  const serverless = yaml.load(path.join(serviceFullPath, 'serverless.yml'))
+  const serverlessFile = serverlessConfig.readServerlessFile(serviceFullPath)
 
   // Get endpoints for service and add the info related to the matching serverless offline server
-  let endpoints = getEndpointsForService(serverless)
+  let endpoints = serverlessConfig.getEndpointsInService(serverlessFile)
   endpoints = endpoints.map((element) => {
     element.host = `http://localhost:${processPort}`
     return element

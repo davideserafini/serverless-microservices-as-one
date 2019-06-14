@@ -169,8 +169,12 @@ mapping.forEach((element) => {
       }
 
       // Send and hope it works :D
-      const response = await got(serverlessUrl, options);
-      res.status(response.statusCode).send(response.body);
+      try {
+        const response = await got(serverlessUrl, options);
+        res.status(response.statusCode).send(response.body);
+      } catch (error) {
+        res.status(error.statusCode).send(error.body);
+      }
     }
   });
 });

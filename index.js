@@ -164,7 +164,7 @@ mapping.forEach((element) => {
       }
 
       // Add body
-      if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+      if (method === 'post' || method === 'put' || method === 'patch') {
         options.body = body;
       }
 

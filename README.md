@@ -1,4 +1,4 @@
-# Serverless Microservices As One (how to handle multiple API gateways with servless offline)
+# Serverless Microservices As One (how to handle multiple API gateways with serverless offline)
 This is a node server that allows to use multiple running serverless offline instances as a single backend, i.e. on a singe host and port.
 
 It manages everything out-of-the-box, from starting up all the servers to routing the incoming requests to the relevant service, everything dynamically by looping the services folder in your project and parsing serverless.yml files.

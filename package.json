@@ -9,7 +9,7 @@
   "author": "Davide Serafini <davide@davideserafini.com>",
   "license": "MIT",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "got": "^9.6.0",
     "minimist": "^1.2.0",
     "yaml-boost": "^1.9.7"
